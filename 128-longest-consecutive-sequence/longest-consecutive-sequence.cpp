@@ -1,26 +1,20 @@
-#include <vector>
-#include <unordered_set>
-
 class Solution {
 public:
     int longestConsecutive(vector<int>& nums) {
-        unordered_set<int> numSet(nums.begin(), nums.end());
-        int longestStreak = 0;
-
-        for (int num : numSet) {
-            if (!numSet.count(num - 1)) {
-                int currentNum = num;
-                int currentStreak = 1;
-
-                while (numSet.count(currentNum + 1)) {
-                    currentNum++;
-                    currentStreak++;
-                }
-
-                longestStreak = max(longestStreak, currentStreak);
-            }
+       int res=0;
+       unordered_map<int,int>mp;
+       for(int i=0;i<nums.size();i++){
+        int num=nums[i];
+        if(!mp[num]){
+            int left= mp[num -1];
+            int right= mp[num +1];
+            int length= left + right +1;
+            mp[num]= length;
+            mp[num -left]= length;
+            mp[num + right]= length;
+            res = max(res,length);
         }
-
-        return longestStreak;
+       }
+       return res;
     }
 };

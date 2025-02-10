@@ -1,37 +1,33 @@
 class Solution {
 public:
-    string minWindow(string S, string T) {
-        string result;
-        if (S.empty() || T.empty()) {
-            return result;
+    string minWindow(string s, string t) {
+       if(t.empty())return "";
+       unordered_map<char,int>countT,window;
+       for(char c:t){
+        countT[c]++;
+       }
+       int have=0,need=countT.size();
+       pair<int,int>res={-1,-1};
+       int l=0;
+       int resLen= INT_MAX;
+       for(int r=0;r<s.length();r++){
+        char c=s[r];
+        window[c]++;
+        if(countT.count(c) && window[c] == countT[c]){
+            have++;
         }
-        unordered_map<char, int> map;
-        unordered_map<char, int> window;
-        for (int i = 0; i < T.length(); i++) {
-            map[T[i]]++;
-        }
-        int minLength = INT_MAX;
-        int letterCounter = 0;
-        for (int slow = 0, fast = 0; fast < S.length(); fast++) {
-            char c = S[fast];
-            if (map.find(c) != map.end()) {
-                window[c]++;
-                if (window[c] <= map[c]) {
-                    letterCounter++;
-                }
+        while(have == need){
+            if((r-l+1) < resLen){
+                resLen= r-l+1;
+                res={l,r};  
             }
-            if (letterCounter >= T.length()) {
-                while (map.find(S[slow]) == map.end() ||
-                       window[S[slow]] > map[S[slow]]) {
-                    window[S[slow]]--;
-                    slow++;
-                }
-                if (fast - slow + 1 < minLength) {
-                    minLength = fast - slow + 1;
-                    result = S.substr(slow, minLength);
-                }
+            window[s[l]]--;
+            if(countT.count(s[l]) && window[s[l]] < countT[s[l]]){
+                have--;
             }
+            l++;
         }
-        return result;
+       }
+       return resLen == INT_MAX ? "" : s.substr(res.first,resLen);
     }
 };

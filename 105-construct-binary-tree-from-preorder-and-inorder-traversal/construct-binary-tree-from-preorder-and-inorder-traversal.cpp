@@ -1,34 +1,28 @@
-/**
- * Definition for a binary tree node.
- * struct TreeNode {
- *     int val;
- *     TreeNode *left;
- *     TreeNode *right;
- *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
- *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
- *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left),
- * right(right) {}
- * };
- */
 class Solution {
 public:
-    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
-        return builTreeHelper(preorder, 0, preorder.size(), inorder, 0,
-                              inorder.size());
-    }
-
-    TreeNode* builTreeHelper(vector<int>& preorder, int sp, int ep,
-                             vector<int>& inorder, int si, int ei) {
-        if (sp == ep)
-            return nullptr;
-        TreeNode* root = new TreeNode(preorder[sp]);
-        int dis =
-            find(inorder.begin() + si, inorder.begin() + ei, preorder[sp]) -
-            inorder.begin() - si;
-        root->left = builTreeHelper(preorder, sp + 1, sp + 1 + dis, inorder, si,
-                                    si + dis);
-        root->right = builTreeHelper(preorder, sp + 1 + dis, ep, inorder,
-                                     si + dis + 1, ei);
+    unordered_map<int, int> mp;
+    TreeNode* construct(vector<int>& preorder, vector<int>& inorder, int l, int r, int& idx) {
+        if(l > r)
+            return NULL;
+        
+        int rootVal = preorder[idx];
+        idx++;
+        int i = mp[rootVal];
+        
+        TreeNode* root = new TreeNode(rootVal);
+        root->left     = construct(preorder, inorder, l, i-1, idx);
+        root->right    = construct(preorder, inorder, i+1, r, idx);
+        
         return root;
+    }
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        mp.clear();
+        int n = preorder.size();
+        for(int i = 0; i<n; i++) {
+            mp[inorder[i]] = i;
+        }
+        
+        int idx = 0;
+        return construct(preorder, inorder, 0, n-1, idx);
     }
 };

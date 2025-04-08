@@ -1,64 +1,91 @@
-class TrieNode {
-public:
-    unordered_map<char, TrieNode*> children;
-    bool isWord;
-
-    TrieNode() : isWord(false) {}
-
-    void addWord(const string& word) {
-        TrieNode* cur = this;
-        for (char c : word) {
-            if (!cur->children.count(c)) {
-                cur->children[c] = new TrieNode();
-            }
-            cur = cur->children[c];
-        }
-        cur->isWord = true;
-    }
-};
-
 class Solution {
-    unordered_set<string> res;
-    vector<vector<bool>> visit;
 public:
-    vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
-        TrieNode* root = new TrieNode();
-        for (const string& word : words) {
-            root->addWord(word);
+    vector<string> result;
+    int m, n;
+    
+    struct trieNode {
+        bool endOfWord;
+        char ch;
+        trieNode* children[26];
+    };
+    
+    trieNode* getNode() {
+        trieNode* newNode = new trieNode();
+        newNode->endOfWord = false;
+        for(int i = 0; i<26; i++) {
+            newNode->children[i] = NULL;
         }
-
-        int ROWS = board.size(), COLS = board[0].size();
-        visit.assign(ROWS, vector<bool>(COLS, false));
-
-        for (int r = 0; r < ROWS; ++r) {
-            for (int c = 0; c < COLS; ++c) {
-                dfs(board, r, c, root, "");
+        
+        newNode->ch = ' ';
+        return newNode;
+    }
+    
+    void insert(trieNode* root, string &word) {
+        trieNode* pCrawl = root;
+        
+        for(int i = 0; i<word.length(); i++) {
+            char ch = word[i];
+            int idx = ch-'a';
+            
+            if(pCrawl->children[idx] == NULL) {
+                pCrawl->children[idx] = getNode();
+                pCrawl->children[idx]->ch = ch;
+            }
+            
+            pCrawl = pCrawl->children[idx];
+        }
+        
+        pCrawl->endOfWord = true;
+    }
+    
+    vector<vector<int>> directions{{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+    void findWords(vector<vector<char>>& board, int i, int j, trieNode* root, string s) {
+        if(i < 0 || i >= m || j < 0 || j >= n)
+            return;
+        
+        char ch = board[i][j];
+        int idx = ch-'a';
+        if(board[i][j] == '$' || root->children[idx] == NULL)
+            return;
+        
+        root = root->children[idx];
+        s.push_back(ch);
+        if(root->endOfWord == true) {
+            result.push_back(s);
+            root->endOfWord = false;
+        }
+        
+        char temp = board[i][j];
+        board[i][j] = '$';
+        for(vector<int>& dir : directions) {
+            int new_i = i + dir[0];
+            int new_j = j + dir[1];
+            
+            findWords(board, new_i, new_j, root, s);
+        }
+        board[i][j] = temp;
+    }
+    
+    vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
+        m = board.size();
+        n = board[0].size();
+        
+        trieNode* root = getNode();
+        
+        for(string &word : words) {
+            insert(root, word);
+        }
+        
+        for(int i = 0; i<m; i++) {
+            for(int j = 0; j<n; j++) {
+                char ch = board[i][j];
+                int idx = ch-'a';
+                string s = "";
+                if(root->children[idx] != NULL)
+                    findWords(board, i, j, root,s);
             }
         }
-        return vector<string>(res.begin(), res.end());
-    }
-
-private:
-    void dfs(vector<vector<char>>& board, int r, int c, TrieNode* node, string word) {
-        int ROWS = board.size(), COLS = board[0].size();
-        if (r < 0 || c < 0 || r >= ROWS || 
-            c >= COLS || visit[r][c] || 
-            !node->children.count(board[r][c])) {
-            return;
-        }
-
-        visit[r][c] = true;
-        node = node->children[board[r][c]];
-        word += board[r][c];
-        if (node->isWord) {
-            res.insert(word);
-        }
-
-        dfs(board, r + 1, c, node, word);
-        dfs(board, r - 1, c, node, word);
-        dfs(board, r, c + 1, node, word);
-        dfs(board, r, c - 1, node, word);
-
-        visit[r][c] = false;
+        
+        return result;
     }
 };

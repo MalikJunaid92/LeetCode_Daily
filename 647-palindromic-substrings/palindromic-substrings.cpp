@@ -1,0 +1,19 @@
+class Solution {
+public:
+    int countSubstrings(string s) {
+        int count = 0;
+
+        for (int center = 0; center < 2 * s.length() - 1; ++center) {
+            int left = center / 2;
+            int right = left + center % 2;
+
+            while (left >= 0 && right < s.length() && s[left] == s[right]) {
+                count++;
+                left--;
+                right++;
+            }
+        }
+
+        return count;
+    }
+};

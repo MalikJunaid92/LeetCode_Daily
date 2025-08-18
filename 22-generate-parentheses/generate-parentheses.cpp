@@ -1,26 +1,18 @@
 class Solution {
 public:
-    vector<string> generateParenthesis(int n) {
-
-        vector<string> result;
-        generateParenthesisHelper("", n, n, result);
-        return result;
-    }
-
-private:
-    void generateParenthesisHelper(string current, int open, int close,
-                                   vector<string>& result) {
-        if (open == 0 && close == 0) {
-            result.push_back(current);
+    void generate(string s, int open, int close, int n, vector<string>& res) {
+        if (s.size() == n * 2) {
+            res.push_back(s);
             return;
         }
-
-        if (open > 0) {
-            generateParenthesisHelper(current + '(', open - 1, close, result);
-        }
-
-        if (close > open) {
-            generateParenthesisHelper(current + ')', open, close - 1, result);
-        }
+        if (open < n)
+            generate(s + "(", open + 1, close, n, res);
+        if (close < open)
+            generate(s + ")", open, close + 1, n, res);
+    }
+    vector<string> generateParenthesis(int n) {
+        vector<string> res;
+        generate("", 0, 0, n, res);
+        return res;
     }
 };

@@ -10,19 +10,18 @@
  */
 class Solution {
 public:
-    ListNode* removeNthFromEnd(ListNode* head, int n) {
-       ListNode* dummy= new ListNode(0,head);
-       ListNode* l=dummy;
-       ListNode* r=head;
-       while(n > 0){
-        r=r->next;
+    ListNode* rec(ListNode* head, int& n) {
+        if (!head)
+            return NULL;
+        head->next = rec(head->next, n);
         n--;
-       }
-       while(r != nullptr){
-        l=l->next;
-        r=r->next;
-       }
-       l->next= l->next->next;
-       return dummy->next;
+        if (n == 0) {
+            return head->next;
+        }
+        return head;
+    }
+
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        return rec(head,n);
     }
 };

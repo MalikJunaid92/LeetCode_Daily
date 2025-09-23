@@ -1,56 +1,36 @@
-/*
-// Definition for a Node.
-class Node {
-public:
-    int val;
-    Node* next;
-    Node* random;
-    
-    Node(int _val) {
-        val = _val;
-        next = NULL;
-        random = NULL;
-    }
-};
-*/
-
 class Solution {
 public:
     Node* copyRandomList(Node* head) {
-        if (!head) return nullptr;
-
-        // Step 1: Create new nodes and interweave them with the original nodes
+        if (!head)
+            return NULL;
+        map<Node*, Node*> mp;
         Node* curr = head;
-        while (curr) {
-            Node* newNode = new Node(curr->val);
-            newNode->next = curr->next;
-            curr->next = newNode;
-            curr = newNode->next;
-        }
+        Node* prev = NULL;
+        Node* newHead = NULL;
 
-        // Step 2: Assign random pointers to the newly created nodes
-        curr = head;
         while (curr) {
-            if (curr->random) {
-                curr->next->random = curr->random->next;
-            }
-            curr = curr->next->next;
-        }
-
-        // Step 3: Separate the original and the copied list
-        curr = head;
-        Node* newHead = head->next;
-        Node* copy = newHead;
-        
-        while (curr) {
-            curr->next = curr->next->next;
-            if (copy->next) {
-                copy->next = copy->next->next;
+            Node* temp = new Node(curr->val);
+            mp[curr] = temp;
+            if (newHead == NULL) {
+                newHead = temp;
+                prev = temp;
+            } else {
+                prev->next = temp;
+                prev = temp;
             }
             curr = curr->next;
-            copy = copy->next;
         }
-
+        curr = head;
+        Node* newCurr = newHead;
+        while (curr) {
+            if (curr->random == NULL) {
+                newCurr->random = NULL;
+            } else {
+                newCurr->random = mp[curr->random];
+            }
+            newCurr = newCurr->next;
+            curr = curr->next;
+        }
         return newHead;
     }
 };

@@ -1,23 +1,32 @@
-// recursion method
 class Solution {
 public:
     ListNode* reverseKGroup(ListNode* head, int k) {
-        ListNode* cur = head;
-        int group = 0;
-        while (cur != nullptr && group < k) {
-            cur = cur->next;
-            group++;
+        if (!head)
+            return nullptr;
+        ListNode* prev = nullptr;
+        ListNode* next = nullptr;
+        ListNode* curr = head;
+        // Step 1: Check if there are at least k nodes ahead
+        ListNode* temp = head;
+        for (int i = 0; i < k; i++) {
+            if (!temp)
+                return head;
+            temp = temp->next;
         }
-        if (group == k) {
-            cur = reverseKGroup(cur, k);
-            while (group-- > 0) {
-                ListNode* tmp = head->next;
-                head->next = cur;
-                cur = head;
-                head = tmp;
-            }
-            head = cur;
+        int count = 0;
+        // Step 2: Reverse k nodes
+
+        while (curr && count < k) {
+            next = curr->next;
+            curr->next = prev;
+            prev = curr;
+            curr = next;
+            count++;
         }
-        return head;
+        // Step 3: Recurse for next groups
+        head->next = reverseKGroup(curr, k);
+
+        // prev is the new head of this reversed group
+        return prev;
     }
 };

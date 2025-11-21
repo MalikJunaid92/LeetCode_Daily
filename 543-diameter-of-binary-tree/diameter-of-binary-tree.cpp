@@ -13,7 +13,7 @@
 class Solution {
 public:
     int solve(TreeNode* root, int& result) {
-        if(root == NULL){
+        if (root == NULL) {
             return 0;
         }
         int left = solve(root->left, result);
